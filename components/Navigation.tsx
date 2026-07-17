@@ -2,22 +2,26 @@
 
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
-import { Bell, Compass, HelpCircle, Search, Settings, ShieldCheck } from 'lucide-react'
+import { Bell, Compass, HelpCircle, Search, Settings, ShieldCheck, LogOut, User } from 'lucide-react'
 import { useAuth } from '@/lib/AuthContext'
 import { Button } from '@/components/ui/button'
+import { useState } from 'react'
 
 const navItems = [
   { href: '/dashboard', label: 'Overview' },
   { href: '/tenders', label: 'Tenders' },
+  { href: '/suppliers', label: 'Suppliers' },
   { href: '/consortia', label: 'Consortiums' },
   { href: '/compliance', label: 'Compliance' },
   { href: '/profile', label: 'Profile' },
+  { href: '/reports', label: 'Reports' },
 ]
 
 export default function Navigation() {
   const { user, logout } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
+  const [showDropdown, setShowDropdown] = useState(false)
 
   const handleLogout = () => {
     logout()
@@ -75,14 +79,38 @@ export default function Navigation() {
           <button className="rounded-xl border border-slate-200 bg-white p-2 text-slate-600 transition hover:border-slate-300 hover:bg-slate-50">
             <HelpCircle className="h-4 w-4" />
           </button>
-          <div className="ml-2 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">
-              {user.name.charAt(0)}
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-slate-900">{user.name}</p>
-              <p className="text-xs text-slate-500">{user.role === 'admin' ? 'Administrator' : 'Supplier'}</p>
-            </div>
+          <div className="relative ml-2">
+            <button 
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 hover:border-slate-300 transition"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">
+                {user.name.charAt(0)}
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900">{user.name}</p>
+                <p className="text-xs text-slate-500">{user.role === 'admin' ? 'Administrator' : 'Supplier'}</p>
+              </div>
+            </button>
+            {showDropdown && (
+              <div className="absolute right-0 mt-2 w-48 rounded-2xl border border-slate-200 bg-white shadow-lg z-50">
+                <Link href="/profile" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 first:rounded-t-2xl">
+                  <User className="h-4 w-4" />
+                  View profile
+                </Link>
+                <Link href="/settings" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-700 hover:bg-slate-50">
+                  <Settings className="h-4 w-4" />
+                  Settings
+                </Link>
+                <button 
+                  onClick={() => { handleLogout(); setShowDropdown(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-rose-600 hover:bg-slate-50 rounded-b-2xl"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Log out
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
